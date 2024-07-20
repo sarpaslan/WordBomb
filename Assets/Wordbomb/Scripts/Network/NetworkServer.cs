@@ -16,6 +16,7 @@ namespace WordBomb.Network
         public Dictionary<MessageType, Action<int, NetworkMemoryStream>> MessageListeners
         = new();
         public NetworkMemoryStream Stream = new();
+        private NetworkMatchmaking m_networkMatchmaking;
 
         private void Awake()
         {
@@ -29,6 +30,7 @@ namespace WordBomb.Network
             m_server.onError += OnError;
             MessageListeners.Add(MessageType.LoginRequest, OnLoginRequest);
             MessageListeners.Add(MessageType.KeepAlive, KeepAlive);
+            m_networkMatchmaking = new NetworkMatchmaking(this);
             StartCoroutine(KeepAliveCoroutine());
         }
 
@@ -114,6 +116,7 @@ namespace WordBomb.Network
             m_server.onDisconnect -= OnDisconnect;
             m_server.onData -= OnData;
             m_server.onError -= OnError;
+            m_networkMatchmaking.Dispose();
         }
     }
 }
