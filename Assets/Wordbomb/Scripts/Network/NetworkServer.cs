@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using JamesFrowen.SimpleWeb;
 using UnityEngine;
 using System.Collections;
+using UnityEngineInternal;
 
 namespace WordBomb.Network
 {
@@ -20,6 +21,11 @@ namespace WordBomb.Network
 
         private void Awake()
         {
+            if (!Application.isEditor && !Application.isBatchMode)
+            {
+                Destroy(gameObject);
+                return;
+            }
             m_config = NetworkCommon.TcpConfig;
             m_server = new SimpleWebServer(NetworkCommon.MaxMessagePerTick, m_config,
             NetworkCommon.MaxMessageSize, NetworkCommon.MaxHandShakeSize, NetworkCommon.SslConfig);
@@ -47,6 +53,10 @@ namespace WordBomb.Network
                     m_server.SendOne(id, segment);
                 }
             }
+        }
+        public void SendOne(int connectionId, ArraySegment<byte> segment)
+        {
+            m_server.SendOne(connectionId, segment);
         }
 
         public void KeepAlive(int arg1, NetworkMemoryStream stream)
@@ -85,7 +95,6 @@ namespace WordBomb.Network
             };
             Connections.Add(id, client);
             m_connectionIds.Add(id);
-            Debug.Log($"{id} is connected");
         }
 
         private void OnDisconnect(int id)
@@ -117,6 +126,16 @@ namespace WordBomb.Network
             m_server.onData -= OnData;
             m_server.onError -= OnError;
             m_networkMatchmaking.Dispose();
+        }
+
+        public Client GetClient(int id)
+        {
+            return Connections[id];
+        }
+
+        public void ErrorUser(int id, string v)
+        {
+            Debug.Log("id" + v);
         }
     }
 }

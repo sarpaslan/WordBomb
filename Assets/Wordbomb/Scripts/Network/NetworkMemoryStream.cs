@@ -23,5 +23,9 @@ namespace WordBomb.Network
             m_memoryStream.Write(messageSegment);
             m_memoryStream.Position = 0;
         }
+        public byte[] ToArray()
+        {
+            return m_memoryStream.ToArray();
+        }
     }
 }

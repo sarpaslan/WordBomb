@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using JamesFrowen.SimpleWeb;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace WordBomb.Network
 {
@@ -12,8 +13,9 @@ namespace WordBomb.Network
         public string Name;
         private SimpleWebClient m_client;
         public bool Connected;
-        public Action ConnectedToServer;
-        public Action DisconnectedFromServer;
+        public UnityEvent OnStart = new();
+        public UnityEvent ConnectedToServer = new();
+        public UnityEvent DisconnectedFromServer = new();
         public Dictionary<MessageType, Action<NetworkMemoryStream>> MessageListeners
         = new();
         public NetworkMemoryStream Stream = new();
@@ -31,7 +33,7 @@ namespace WordBomb.Network
             m_client.onConnect += OnConnected;
             m_client.onDisconnect += OnDisconnected;
             m_client.onData += OnData;
-            MessageListeners.Add(MessageType.KeepAlive, KeepAlive);
+            OnStart?.Invoke();
         }
 
         private void KeepAlive(NetworkMemoryStream stream)
@@ -48,12 +50,14 @@ namespace WordBomb.Network
         private void OnConnected()
         {
             StartCoroutine(KeepAliveCoroutine());
+            MessageListeners.Add(MessageType.KeepAlive, KeepAlive);
             Connected = true;
             ConnectedToServer?.Invoke();
         }
 
         private void OnDisconnected()
         {
+            MessageListeners.Remove(MessageType.KeepAlive);
             Connected = false;
             DisconnectedFromServer?.Invoke();
         }
