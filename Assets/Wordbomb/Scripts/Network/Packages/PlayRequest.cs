@@ -11,6 +11,7 @@ namespace WordBomb.Network
         {
             writer.Write((byte)MessageType.LoginRequest);
             writer.Write((byte)Language);
+            //Test
         }
         public void ReadFrom(BinaryReader reader)
         {
