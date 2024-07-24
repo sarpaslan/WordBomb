@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using WordBomb.Network;
@@ -11,13 +10,11 @@ namespace WordBomb.View
         public GameView GameView;
         public NetworkClient Client;
         public Lobby Lobby;
-
         private Dictionary<int, PlayerView> m_playerViews = new Dictionary<int, PlayerView>();
         public void Start()
         {
             Client.MessageListeners.Add(MessageType.JoinedLobbyResponse, OnJoinedLobby);
         }
-
         private void OnJoinedLobby(NetworkMemoryStream stream)
         {
             var lobby = new JoinedLobbyResponse();
@@ -27,7 +24,6 @@ namespace WordBomb.View
             MenuView.gameObject.SetActive(false);
             CreateGame(Lobby);
         }
-
         private void CreateGame(Lobby lobby)
         {
             foreach (var client in lobby.Clients)
@@ -50,5 +46,4 @@ namespace WordBomb.View
             Client?.MessageListeners.Remove(MessageType.JoinedLobbyResponse);
         }
     }
-
 }
